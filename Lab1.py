@@ -20,7 +20,7 @@ def csvloadandplot(filepath, timestep):
     plt.show()
     return x
 
-x = csvloadandplot('https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/tute1.csv', 31)
+tute = csvloadandplot('https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/tute1.csv', 31)
 
 # Question 2:
 
@@ -28,10 +28,24 @@ def summary_stats(df):
     for i in range(len(df.columns)):
         print(f"The {df.columns[i]} mean is: {df.iloc[:,i].mean()} and the variance is: {df.iloc[:,i].var()} with standard deviation: {df.iloc[:,i].std()} median: {df.iloc[:,i].median()}")
 
-summary_stats(x)
+summary_stats(tute)
 
 # Question 3:
 
+def cal_rolling_mean_var(x):
+    lst = []
+    for i in range(len(x.columns)):
+        for n in range(len(x)):
+            if n < len(x):
+                lst.append([i, n, x.iloc[:, i].head(n).mean(), x.iloc[:, i].head(n).var()])
+    df = pd.DataFrame(lst)
+    df = df.set_index(0)
+    for i in range(len(x.columns)):
+        fig, ax = plt.subplots(2, 1)
+        ax[0].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 1])
+        ax[1].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 2])
+
+cal_rolling_mean_var(tute)
 
 # Question 4:
 
