@@ -49,16 +49,46 @@ cal_rolling_mean_var(tute)
 
 # Question 4:
 
+#print(f"comments on results")
 
 # Question 5:
 
+from statsmodels.tsa.stattools import adfuller
+
+def ADF_Cal(x):
+    result = adfuller(x)
+    print("ADF Statistic: %f" %result[0])
+    print('p-value: %f' % result[1])
+    print('Critical Values:')
+    for key, value in result[4].items():
+        print('\t%s: %.3f' % (key, value))
+
+ADF_Cal(x.Sales)
+ADF_Cal(x.AdBudget)
+ADF_Cal(x.GDP)
 
 # Question 6:
 
+from statsmodels.tsa.stattools import kpss
+
+def kpss_test(timeseries):
+    print ('Results of KPSS Test:')
+    kpsstest = kpss(timeseries, regression='c', nlags="auto")
+    kpss_output = pd.Series(kpsstest[0:3], index=['Test Statistic','p-value','Lags Used'])
+    for key,value in kpsstest[3].items():
+        kpss_output['Critical Value (%s)'%key] = value
+        print (kpss_output)
+
+kpss_test(x.Sales)
+kpss_test(x.AdBudget)
+kpss_test(x.GDP)
 
 # Question 7:
 
 #csvloadandplot('https://raw.githubusercontent.com/rjafari979/Time-Series-Analysis-and-Moldeing/master/AirPassengers.csv',1)
 
+
 # Question 8:
+
+
 
