@@ -1,9 +1,7 @@
-# %%
 # DATS 6313: Lab 1 - Tyler Wallett
 import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.stattools import adfuller
-
 
 # Question 1:
 
@@ -26,19 +24,19 @@ def csvloadandplot(filepath, timestep):
     return x
 
 
-x = csvloadandplot(
+df = csvloadandplot(
     'https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/tute1.csv', 31)
 
 
 # Question 2:
 
-def summary_stats(df):
-    for i in range(len(df.columns)):
+def summary_stats(x):
+    for i in range(len(x.columns)):
         print(
-            f"The {df.columns[i]} mean is: {df.iloc[:, i].mean()} and the variance is: {df.iloc[:, i].var()} with standard deviation: {df.iloc[:, i].std()} median: {df.iloc[:, i].median()}")
+            f"The {x.columns[i]} mean is: {x.iloc[:, i].mean()} and the variance is: {x.iloc[:, i].var()} with standard deviation: {x.iloc[:, i].std()} median: {x.iloc[:, i].median()}")
 
 
-summary_stats(x)
+summary_stats(df)
 
 
 # Question 3:
@@ -62,9 +60,10 @@ def cal_rolling_mean_var(x):
         ax[1].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 2])
         ax[1].set_title(f"Rolling variance - {x.columns[i]}")
         ax[1].set_ylabel("Magnitude")
+        plt.show()
 
 
-cal_rolling_mean_var(x)
+cal_rolling_mean_var(df)
 
 # Question 4:
 
@@ -85,9 +84,9 @@ def ADF_Cal(x):
         print('\t%s: %.3f' % (key, value))
 
 
-ADF_Cal(x.Sales)
-ADF_Cal(x.AdBudget)
-ADF_Cal(x.GDP)
+ADF_Cal(df.Sales)
+ADF_Cal(df.AdBudget)
+ADF_Cal(df.GDP)
 
 print(
     f"Based on the ADF results, at a 95% confidence level, Sales and GDP do not have a unit root, however AdBudget does have a unit root. Meaning, Sales and GDP are mean stationary, and AdBudget is not mean stationary. Contrasted to the previous results, of question 4, Adbudget graph appears to be deceitful in terms of stationarity.")
@@ -106,28 +105,27 @@ def kpss_test(timeseries):
         print(kpss_output)
 
 
-kpss_test(x.Sales)
-kpss_test(x.AdBudget)
-kpss_test(x.GDP)
+kpss_test(df.Sales)
+kpss_test(df.AdBudget)
+kpss_test(df.GDP)
 
 print(
     f"Based on the resulting 0.1 p-value for each kpss test, for Sales, AdBudget and GDP, we accept the null hypothesis that all features are mean and variance stationary. Contrasted to the previous results of question 5, kpss p-value seems to contradict that of AdBudget.")
 
 # Question 7:
 
-new = csvloadandplot(
+df2 = csvloadandplot(
     'https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/AirPassengers.csv',
     12)
 
-summary_stats(new)
+summary_stats(df2)
 
-cal_rolling_mean_var(new)
+cal_rolling_mean_var(df2)
 
-ADF_Cal(new)
+ADF_Cal(df2)
 
-kpss(new)
+kpss(df2)
 
-# %%
 # Question 8:
 import numpy as np
 
@@ -159,10 +157,10 @@ def ts_transformations(x, features_amount):
             plt.ylabel("Frequency")
             plt.show()
 
-        for i in range(len(new.columns)):
-            difflog = np.log(new).diff()
+        for i in range(len(x.columns)):
+            difflog = np.log(x).diff()
             plt.hist(difflog)
-            plt.title(f"First order Logarithmic differencing: {new.columns[i]}")
+            plt.title(f"First order Logarithmic differencing: {x.columns[i]}")
             plt.xlabel("First order Log residuals")
             plt.ylabel("Frequency")
             plt.show()
@@ -214,6 +212,5 @@ def ts_transformations(x, features_amount):
             kpss_test(logdf.iloc[1:, i])
             ADF_Cal(logdf.iloc[1:, i])
 
-
-ts_transformations(new, 1)
+ts_transformations(df2, 1)
 
