@@ -39,7 +39,6 @@ def summary_stats(df):
 
 summary_stats(x)
 
-
 # Question 3:
 
 def cal_rolling_mean_var(x):
@@ -118,14 +117,74 @@ new = csvloadandplot(
     'https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/AirPassengers.csv',
     12)
 
-summary_stats(new)
-
 cal_rolling_mean_var(new)
+
+summary_stats(new)
 
 ADF_Cal(new)
 
-kpss(new)
+kpss_test(new)
 
 #Question 8:
+def ts_transformations(x, features_amount):
+    if features_amount == 1:
+
+        for i in range(len(new.columns)):
+            diff = new.diff()
+            plt.hist(diff)
+            plt.title(f"First order non-seasonal differencing: {new.columns[i]}")
+            plt.xlabel("First order residuals")
+            plt.ylabel("Frequency")
+            plt.show()
+
+        for i in range(len(new.columns)):
+            diff = new.diff(periods=2)
+            plt.hist(diff)
+            plt.title(f"Second order non-seasonal differencing: {new.columns[i]}")
+            plt.xlabel("Second order residuals")
+            plt.ylabel("Frequency")
+            plt.show()
+
+        for i in range(len(new.columns)):
+            diff = new.diff(periods=3)
+            plt.hist(diff)
+            plt.title(f"Third order non-seasonal differencing: {new.columns[i]}")
+            plt.xlabel("Third order residuals")
+            plt.ylabel("Frequency")
+            plt.show()
+
+    elif features_amount > 1:
+        fig, ax = plt.subplots(1, features_amount, figsize=(10, 5))
+        fig.suptitle("First order non-seasonal differencing")
+        fig.supxlabel("First order residuals")
+        fig.supylabel("Frequency")
+        for i in range(len(x.columns)):
+            diff = x.iloc[:, i].diff()
+            ax[i].hist(diff)
+            ax[i].set_title(f"{x.columns[i]}")
+
+        fig, ax = plt.subplots(1, features_amount, figsize=(10, 5))
+        fig.suptitle("Second order non-seasonal differencing")
+        fig.supxlabel("Second order residuals")
+        fig.supylabel("Frequency")
+        for i in range(len(x.columns)):
+            diff = x.iloc[:, i].diff(periods=2)
+            ax[i].hist(diff)
+            ax[i].set_title(f"{x.columns[i]}")
+
+        fig, ax = plt.subplots(1, features_amount, figsize=(10, 5))
+        fig.suptitle("Third order non-seasonal differencing")
+        fig.supxlabel("Third order residuals")
+        fig.supylabel("Frequency")
+        for i in range(len(x.columns)):
+            diff = x.iloc[:, i].diff(periods=3)
+            ax[i].hist(diff)
+            ax[i].set_title(f"{x.columns[i]}")
+
+
+ts_transformations(new, 1)
+
+
+
 
 
