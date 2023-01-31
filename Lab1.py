@@ -1,3 +1,4 @@
+# %%
 # DATS 6313: Lab 1 - Tyler Wallett
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -38,6 +39,7 @@ def summary_stats(df):
 
 
 summary_stats(x)
+
 
 # Question 3:
 
@@ -117,41 +119,58 @@ new = csvloadandplot(
     'https://raw.githubusercontent.com/rjafari979/Information-Visualization-Data-Analytics-Dataset-/main/AirPassengers.csv',
     12)
 
-cal_rolling_mean_var(new)
-
 summary_stats(new)
+
+cal_rolling_mean_var(new)
 
 ADF_Cal(new)
 
-kpss_test(new)
+kpss(new)
 
-#Question 8:
+# %%
+# Question 8:
+import numpy as np
+
+
 def ts_transformations(x, features_amount):
     if features_amount == 1:
 
-        for i in range(len(new.columns)):
-            diff = new.diff()
-            plt.hist(diff)
-            plt.title(f"First order non-seasonal differencing: {new.columns[i]}")
+        for i in range(len(x.columns)):
+            diff1 = x.diff()
+            plt.hist(diff1)
+            plt.title(f"First order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("First order residuals")
             plt.ylabel("Frequency")
             plt.show()
 
-        for i in range(len(new.columns)):
-            diff = new.diff(periods=2)
-            plt.hist(diff)
-            plt.title(f"Second order non-seasonal differencing: {new.columns[i]}")
+        for i in range(len(x.columns)):
+            diff2 = x.diff(periods=2)
+            plt.hist(diff2)
+            plt.title(f"Second order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("Second order residuals")
             plt.ylabel("Frequency")
             plt.show()
 
-        for i in range(len(new.columns)):
-            diff = new.diff(periods=3)
-            plt.hist(diff)
-            plt.title(f"Third order non-seasonal differencing: {new.columns[i]}")
+        for i in range(len(x.columns)):
+            diff3 = x.diff(periods=3)
+            plt.hist(diff3)
+            plt.title(f"Third order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("Third order residuals")
             plt.ylabel("Frequency")
             plt.show()
+
+        for i in range(len(new.columns)):
+            difflog = np.log(new).diff()
+            plt.hist(difflog)
+            plt.title(f"First order Logarithmic differencing: {new.columns[i]}")
+            plt.xlabel("First order Log residuals")
+            plt.ylabel("Frequency")
+            plt.show()
+
+        logdf = np.log(x).diff()
+        for i in range(len(logdf.columns)):
+            kpss_test(logdf.iloc[1:, i])
+            ADF_Cal(logdf.iloc[1:, i])
 
     elif features_amount > 1:
         fig, ax = plt.subplots(1, features_amount, figsize=(10, 5))
@@ -181,10 +200,20 @@ def ts_transformations(x, features_amount):
             ax[i].hist(diff)
             ax[i].set_title(f"{x.columns[i]}")
 
+        fig, ax = plt.subplots(1, features_amount, figsize=(10, 5))
+        fig.suptitle("First order Logarithmic differencing")
+        fig.supxlabel("First order Log residuals")
+        fig.supylabel("Frequency")
+        for i in range(len(x.columns)):
+            difflog = np.log(x.iloc[:, i]).diff()
+            ax[i].hist(difflog)
+            ax[i].set_title(f"{x.columns[i]}")
+
+        logdf = np.log(x).diff()
+        for i in range(len(logdf.columns)):
+            kpss_test(logdf.iloc[1:, i])
+            ADF_Cal(logdf.iloc[1:, i])
+
 
 ts_transformations(new, 1)
-
-
-
-
 
