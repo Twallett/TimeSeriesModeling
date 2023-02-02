@@ -54,6 +54,7 @@ def cal_rolling_mean_var(x):
 
     for i in range(len(x.columns)):
         fig, ax = plt.subplots(2, 1, figsize=(10, 7))
+        fig.supxlabel("Samples")
         ax[0].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 1])
         ax[0].set_title(f"Rolling mean - {x.columns[i]}")
         ax[0].set_ylabel("Magnitude")
@@ -124,17 +125,17 @@ cal_rolling_mean_var(df2)
 
 ADF_Cal(df2)
 
-kpss(df2)
+kpss_test(df2)
 
 # Question 8:
 import numpy as np
-
 
 def ts_transformations(x, features_amount):
     if features_amount == 1:
 
         for i in range(len(x.columns)):
             diff1 = x.diff()
+            ADF_Cal(diff1.iloc[1:, i])
             plt.hist(diff1)
             plt.title(f"First order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("First order residuals")
@@ -143,6 +144,7 @@ def ts_transformations(x, features_amount):
 
         for i in range(len(x.columns)):
             diff2 = x.diff(periods=2)
+            ADF_Cal(diff2.iloc[2:, i])
             plt.hist(diff2)
             plt.title(f"Second order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("Second order residuals")
@@ -151,6 +153,7 @@ def ts_transformations(x, features_amount):
 
         for i in range(len(x.columns)):
             diff3 = x.diff(periods=3)
+            ADF_Cal(diff3.iloc[3:, i])
             plt.hist(diff3)
             plt.title(f"Third order non-seasonal differencing: {x.columns[i]}")
             plt.xlabel("Third order residuals")
@@ -167,7 +170,6 @@ def ts_transformations(x, features_amount):
 
         logdf = np.log(x).diff()
         for i in range(len(logdf.columns)):
-            kpss_test(logdf.iloc[1:, i])
             ADF_Cal(logdf.iloc[1:, i])
 
     elif features_amount > 1:
