@@ -5,10 +5,11 @@ import pandas as pd
 
 # Question 2:
 
-def white_noise():
+def white_noise(random_seed):
     start_date = '01/01/2000'
     end_date = '31/12/2000'
     date = pd.date_range(start_date, end_date, periods=1000)
+    np.random.seed(random_seed)
     x = np.random.normal(0, 1, size=1000).round(2)
     df = pd.DataFrame(x, index=date)
     plt.hist(df)
@@ -26,13 +27,13 @@ def white_noise():
     return df[0]
 
 
-df = white_noise()
+wn = white_noise(6313)
 
 # Question 3
 
 q1 = [3, 9, 27, 81, 243]
 
-def auto_correlation(T, tau):
+def auto_correlation(T, tau, title):
     # Y-BAR
     y_bar = np.average(T)
 
@@ -42,7 +43,7 @@ def auto_correlation(T, tau):
         x.append(np.sum((T[t] - y_bar) ** 2))
         denom = sum(x)
 
-    # NUMERATOR     *** PROBLEM IS HERE ****
+    # NUMERATOR
     numerator_sum = []
     count = 0
     for i in range(tau + 1):
@@ -51,11 +52,11 @@ def auto_correlation(T, tau):
         count += 1
 
     numerator = []
-    for i in range(len(T), len(T) - tau, -1):
+    for i in range(len(T), len(T) - tau - 1, -1):
         numerator.append(sum(numerator_sum[:i]))
         numerator_sum = numerator_sum[i:]
 
-    # NUM/DENOM ##### NOT HERE
+    # NUMERATOR /DENOMINATOR
     r_hat = []
     for i in range(len(numerator)):
         r_hat.append([i, numerator[i] / denom])
@@ -71,10 +72,15 @@ def auto_correlation(T, tau):
 
     plt.stem(r_hat.index, r_hat[0])
     plt.fill_between(r_hat.index, insignif, insignif * -1, color='b', alpha=.2)
+    plt.title(title)
+    plt.xlabel(f"Lags")
+    plt.ylabel(f"Magnitude")
 
+auto_correlation(q1,4,"Autocorrelation Function of Question 1")
+plt.show()
 
-
-auto_correlation(df, 20)
+auto_correlation(wn, 20,"Autocorrelation Function of White Noise")
+plt.show()
 
 # 4 lags
 # r_hat(0): 0,1,2,3,4 0,1,2,3,4 = (0,0)+(1,1)+(2,2)+(3,3)+(4,4)
@@ -97,24 +103,29 @@ yf.pdr_override()
 
 ticker = ['AAPL', 'ORCL', 'TSLA', 'IBM', 'YELP', 'MSFT']
 
-
 def stonks_plot(ticker_symbol, lags):
     df = data.get_data_yahoo([stock for stock in ticker_symbol], start="2000-01-01", end="2023-02-01")
     df = df['Close']
     df.dropna(inplace=True)
 
-    plt.figure(figsize=(16, 12))
+    fig = plt.figure(figsize=(16, 12))
+    fig.suptitle("Time-series of Stocks", fontsize =24)
+    fig.supxlabel("Date", fontsize =24)
+    fig.supylabel("Closing price", fontsize =24)
     for i in range(len(df.columns)):
         ax = plt.subplot(3, 2, i + 1)
         plt.plot(df.iloc[:, i])
         plt.title(f"{df.columns[i]}")
     plt.show()
 
-    plt.figure(figsize=(16, 12))
+    fig = plt.figure(figsize=(16, 14))
+    fig.suptitle("Autocorrelation Function of Stocks", fontsize =24)
+    fig.supxlabel("Lags", fontsize =24)
+    fig.supylabel("Magnitude", fontsize =24)
     for i in range(len(df.columns)):
         ax = plt.subplot(3, 2, i + 1)
-        auto_correlation(df.iloc[:, i], lags)
-        plt.title(f"{df.columns[i]} autocorrelation: {lags} lags")
+        auto_correlation(df.iloc[:, i], lags, f"{df.columns[i]}")
+        ax.set(xlabel=None, ylabel=None)
     plt.show()
 
 
