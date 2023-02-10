@@ -32,8 +32,7 @@ df = white_noise()
 
 q1 = [3, 9, 27, 81, 243]
 
-
-def autocorrelation(T, tau):
+def auto_correlation(T, tau):
     # Y-BAR
     y_bar = np.average(T)
 
@@ -70,16 +69,12 @@ def autocorrelation(T, tau):
     # PLOT
     insignif = 1.96 / len(T) ** 0.5
 
-    fig, ax = plt.subplots()
     plt.stem(r_hat.index, r_hat[0])
-    ax.fill_between(r_hat.index, insignif, insignif * -1, color='b', alpha=.2)
-
-    return
+    plt.fill_between(r_hat.index, insignif, insignif * -1, color='b', alpha=.2)
 
 
-autocorrelation(q1, 4)
 
-autocorrelation(df, 20)
+auto_correlation(df, 20)
 
 # 4 lags
 # r_hat(0): 0,1,2,3,4 0,1,2,3,4 = (0,0)+(1,1)+(2,2)+(3,3)+(4,4)
@@ -92,3 +87,35 @@ autocorrelation(df, 20)
 # r_hat(0): 0,1,2,3,4 0,1,2,3,4 = (0,0)+(1,1)+(2,2)+(3,3)+(4,4)
 # r_hat(1): 1,2,3,4 0,1,2,3 = (1,0)+(2,1)+(3,2)+(4,3)
 # r_hat(2): 2,3,4 0,1,2 = (2,0)+(3,1)+(4,2)
+
+# Question 4:
+
+from pandas_datareader import data
+import yfinance as yf
+
+yf.pdr_override()
+
+ticker = ['AAPL', 'ORCL', 'TSLA', 'IBM', 'YELP', 'MSFT']
+
+
+def stonks_plot(ticker_symbol, lags):
+    df = data.get_data_yahoo([stock for stock in ticker_symbol], start="2000-01-01", end="2023-02-01")
+    df = df['Close']
+    df.dropna(inplace=True)
+
+    plt.figure(figsize=(16, 12))
+    for i in range(len(df.columns)):
+        ax = plt.subplot(3, 2, i + 1)
+        plt.plot(df.iloc[:, i])
+        plt.title(f"{df.columns[i]}")
+    plt.show()
+
+    plt.figure(figsize=(16, 12))
+    for i in range(len(df.columns)):
+        ax = plt.subplot(3, 2, i + 1)
+        auto_correlation(df.iloc[:, i], lags)
+        plt.title(f"{df.columns[i]} autocorrelation: {lags} lags")
+    plt.show()
+
+
+stonks_plot(ticker, 50)
