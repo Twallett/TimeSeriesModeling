@@ -101,32 +101,48 @@ import yfinance as yf
 
 yf.pdr_override()
 
-ticker = ['AAPL', 'ORCL', 'TSLA', 'IBM', 'YELP', 'MSFT']
+
+ticker = ['AAPL', 'ORCL', 'TSLA', 'IBM', 'YELP','MSFT']
 
 def stonks_plot(ticker_symbol, lags):
     df = data.get_data_yahoo([stock for stock in ticker_symbol], start="2000-01-01", end="2023-02-01")
     df = df['Close']
     df.dropna(inplace=True)
 
-    fig = plt.figure(figsize=(16, 12))
+    fig = plt.figure(figsize=(16, 8))
     fig.suptitle("Time-series of Stocks", fontsize =24)
-    fig.supxlabel("Date", fontsize =24)
-    fig.supylabel("Closing price", fontsize =24)
     for i in range(len(df.columns)):
         ax = plt.subplot(3, 2, i + 1)
         plt.plot(df.iloc[:, i])
         plt.title(f"{df.columns[i]}")
+        plt.tight_layout()
+        plt.grid()
+        plt.xlabel('Date')
+        plt.ylabel('Closing Price')
     plt.show()
 
-    fig = plt.figure(figsize=(16, 14))
+    fig = plt.figure(figsize=(16, 8))
     fig.suptitle("Autocorrelation Function of Stocks", fontsize =24)
-    fig.supxlabel("Lags", fontsize =24)
-    fig.supylabel("Magnitude", fontsize =24)
     for i in range(len(df.columns)):
         ax = plt.subplot(3, 2, i + 1)
         auto_correlation(df.iloc[:, i], lags, f"{df.columns[i]}")
         ax.set(xlabel=None, ylabel=None)
+        plt.tight_layout()
+        plt.grid()
+        plt.xlabel('lags')
+        plt.ylabel('Magnitude')
     plt.show()
+    return df
+
+df = stonks_plot(ticker, 50)
+
+# Question 5:
+
+from toolbox import *
+
+ADF_Cal(wn)
+ADF_Cal(df.loc[:,'YELP'])
+ADF_Cal(df.loc[:,'AAPL'])
 
 
-stonks_plot(ticker, 50)
+
