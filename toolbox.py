@@ -1,3 +1,9 @@
+from statsmodels.tsa.stattools import adfuller
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 def csvloadandplot(filepath, timestep):
     x = pd.read_csv(filepath, index_col=0)
     fig, ax = plt.subplots(figsize=(10, 8))
@@ -43,8 +49,6 @@ def cal_rolling_mean_var(x):
         ax[1].set_ylabel("Magnitude")
         plt.show()
 
-from statsmodels.tsa.stattools import adfuller
-
 def ADF_Cal(x):
     result = adfuller(x)
     print("ADF Statistic: %f" % result[0])
@@ -52,3 +56,47 @@ def ADF_Cal(x):
     print('Critical Values:')
     for key, value in result[4].items():
         print('\t%s: %.3f' % (key, value))
+
+def auto_correlation(T, tau, title):
+    # Y-BAR
+    y_bar = np.average(T)
+
+    # DENOMINATOR
+    x = []
+    for t in range(len(T)):
+        x.append(np.sum((T[t] - y_bar) ** 2))
+        denom = sum(x)
+
+    # NUMERATOR
+    numerator_sum = []
+    count = 0
+    for i in range(tau + 1):
+        for j in range(i, len(T)):
+            numerator_sum.append((T[j] - y_bar) * (T[j - count] - y_bar))
+        count += 1
+
+    numerator = []
+    for i in range(len(T), len(T) - tau - 1, -1):
+        numerator.append(sum(numerator_sum[:i]))
+        numerator_sum = numerator_sum[i:]
+
+    # NUMERATOR /DENOMINATOR
+    r_hat = []
+    for i in range(len(numerator)):
+        r_hat.append([i, numerator[i] / denom])
+        r_hat.append([i * -1, numerator[i] / denom])
+    r_hat.pop(0)
+
+    r_hat = pd.DataFrame([item[1] for item in r_hat], index=[item[0] for item in r_hat])
+
+    r_hat.sort_index(ascending=True, inplace=True)
+
+    # PLOT
+    insignif = 1.96 / len(T) ** 0.5
+
+    plt.stem(r_hat.index, r_hat[0])
+    plt.fill_between(r_hat.index, insignif, insignif * -1, color='b', alpha=.2)
+    plt.title(title)
+    plt.xlabel(f"Lags")
+    plt.ylabel(f"Magnitude")
+    return r_hat

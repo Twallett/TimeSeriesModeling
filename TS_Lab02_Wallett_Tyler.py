@@ -75,11 +75,13 @@ def auto_correlation(T, tau, title):
     plt.title(title)
     plt.xlabel(f"Lags")
     plt.ylabel(f"Magnitude")
+    return r_hat
 
-auto_correlation(q1,4,"Autocorrelation Function of Question 1")
+r_hat1 = auto_correlation(q1,4,"Autocorrelation Function of Question 1")
 plt.show()
+print(r_hat1)
 
-auto_correlation(wn, 20,"Autocorrelation Function of White Noise")
+r_hat2 = auto_correlation(wn, 20,"Autocorrelation Function of White Noise")
 plt.show()
 
 # 4 lags
