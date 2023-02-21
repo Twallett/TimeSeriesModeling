@@ -2,6 +2,7 @@ from statsmodels.tsa.stattools import adfuller
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import MaxNLocator
 
 
 def csvloadandplot(filepath, timestep):
@@ -58,6 +59,9 @@ def ADF_Cal(x):
         print('\t%s: %.3f' % (key, value))
 
 def auto_correlation(T, tau, title):
+    if type(T) != list():
+        T = list(T)
+
     # Y-BAR
     y_bar = np.average(T)
 
@@ -94,9 +98,12 @@ def auto_correlation(T, tau, title):
     # PLOT
     insignif = 1.96 / len(T) ** 0.5
 
-    plt.stem(r_hat.index, r_hat[0])
+    markerline, stemline, baseline = plt.stem(r_hat.index, r_hat[0], basefmt='grey')
     plt.fill_between(r_hat.index, insignif, insignif * -1, color='b', alpha=.2)
     plt.title(title)
+    markerline.set_markerfacecolor('red')
+    markerline.set_markeredgecolor('red')
     plt.xlabel(f"Lags")
     plt.ylabel(f"Magnitude")
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
     return r_hat

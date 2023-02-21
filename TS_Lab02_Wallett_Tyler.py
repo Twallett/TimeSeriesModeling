@@ -34,6 +34,7 @@ wn = white_noise(6313)
 q1 = [3, 9, 27, 81, 243]
 
 def auto_correlation(T, tau, title):
+
     # Y-BAR
     y_bar = np.average(T)
 
@@ -79,7 +80,6 @@ def auto_correlation(T, tau, title):
 
 r_hat1 = auto_correlation(q1,4,"Autocorrelation Function of Question 1")
 plt.show()
-print(r_hat1)
 
 r_hat2 = auto_correlation(wn, 20,"Autocorrelation Function of White Noise")
 plt.show()
