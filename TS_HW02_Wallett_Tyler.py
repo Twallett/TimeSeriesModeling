@@ -18,6 +18,8 @@ def average_method(df, h_step):
             y_hat.append(0)
         if i > 1:
             y_hat.append(sum(df.iloc[:i-1, 0]) / (i-1))
+        if i == h_step:
+            y_hat.append(sum(df.iloc[:i, 0]) / (i))
 
     # H STEP PREDICTION
     y_hat_h = []
@@ -28,7 +30,7 @@ def average_method(df, h_step):
     y_hat_h = pd.Series(y_hat_h, name='y_hat_h')
 
     y_hat = y_hat.append(y_hat_h)
-    y_hat.index = np.arange(1, len(df) + 1)
+    y_hat.index = np.arange(1, len(df) + 2)
     y_hat = pd.Series(y_hat, name='y_hat')
 
     df = df.merge(y_hat, left_index=True, right_index=True)
@@ -65,8 +67,8 @@ print(f"MSE forecasted Average method: {mse_forecast_avg}")
 # Question 4:
 
 def var_errors(df):
-    var_pred = df.iloc[2:9, 3].var()
-    var_forecast = df.iloc[9:, 3].var()
+    var_pred = df.iloc[2:9, 2].var()
+    var_forecast = df.iloc[9:, 2].var()
     return var_pred, var_forecast
 
 var_pred_avg,  var_forecast_avg = var_errors(newdata_avg)
