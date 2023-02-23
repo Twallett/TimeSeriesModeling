@@ -107,3 +107,27 @@ def auto_correlation(T, tau, title):
     plt.ylabel(f"Magnitude")
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
     return r_hat
+
+def cal_rolling_mean_var(x):
+    lst = []
+
+    for i in range(len(x.columns)):
+        for n in range(len(x)):
+            if n < len(x):
+                lst.append([i, n, x.iloc[:, i].head(n).mean(), x.iloc[:, i].head(n).var()])
+
+    df = pd.DataFrame(lst)
+    df = df.set_index(0)
+
+    for i in range(len(x.columns)):
+        fig, ax = plt.subplots(2, 1, figsize=(10, 7))
+        fig.supxlabel("Samples")
+        ax[0].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 1])
+        ax[0].set_title(f"Rolling mean - {x.columns[i]}")
+        ax[0].set_ylabel("Magnitude")
+        ax[1].plot(df[df.index == i][1], df[df.index == i].iloc[0:len(x), 2])
+        ax[1].set_title(f"Rolling variance - {x.columns[i]}")
+        ax[1].set_ylabel("Magnitude")
+        plt.show()
+
+

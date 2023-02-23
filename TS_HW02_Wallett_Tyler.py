@@ -13,35 +13,26 @@ data = pd.DataFrame([data[i][1] for i in range(len(data))], index=[data[i][0] fo
 def average_method(df, h_step):
     # ONE STEP PREDICTION
     y_hat = []
-    error = []
     for i in range(1, len(df[0:h_step]) + 1):
-        y_hat.append(sum(df.iloc[:i, 0]) / i)
-        error.append(df.iloc[i - 1, 0] - (sum(df.iloc[:i, 0]) / i))
+        if i == 1:
+            y_hat.append(0)
+        if i > 1:
+            y_hat.append(sum(df.iloc[:i-1, 0]) / (i-1))
 
     # H STEP PREDICTION
     y_hat_h = []
-    error_h = []
 
     y_hat_h = y_hat[-1:] * len(df[h_step:])
 
-    for i in range(h_step, len(df[h_step:]) + h_step):
-        error_h.append(df.iloc[i, 0] - y_hat_h[i - h_step])
-
     y_hat = pd.Series(y_hat, name='y_hat')
     y_hat_h = pd.Series(y_hat_h, name='y_hat_h')
-    error = pd.Series(error, name='error')
-    error_h = pd.Series(error_h, name='error_h')
 
     y_hat = y_hat.append(y_hat_h)
     y_hat.index = np.arange(1, len(df) + 1)
     y_hat = pd.Series(y_hat, name='y_hat')
 
-    error = error.append(error_h)
-    error.index = np.arange(1, len(df) + 1)
-    error = pd.Series(error, name='error')
-
     df = df.merge(y_hat, left_index=True, right_index=True)
-    df = df.merge(error, left_index=True, right_index=True)
+    df['error'] = df.y - df.y_hat
     df['error_sq'] = df.error ** 2
 
     plt.plot(df.iloc[0:h_step, 0], label='Training dataset')
@@ -88,7 +79,7 @@ def q_value(df, lags):
     train = list(df)
     r_hat = auto_correlation(train, lags, '')
     r_hat = r_hat[lags + 1:lags * 2 + 1] ** 2
-    q = ((np.cumsum(r_hat)) * 9).sum()[0]
+    q = ((np.cumsum(r_hat)) * len(df)).iloc[-1,0]
     plt.close()
     return q
 
@@ -151,18 +142,17 @@ print(f"VAR Forecasted Naive method: {var_forecast_naive}")
 q_naive = q_value(newdata_naive.iloc[2:9, 2], 5)
 print(f"Q-value Naive method: {q_naive}")
 
+
 # Question 7: Drift method 1-5
 
 def drift_method(df, h_step):
     # ONE STEP PREDICTION
     y_hat = []
     for i in range(1, len(df) + 1):
-        if i == 1:
-            y_hat.append(int(df.iloc[i - 1:i, 0]))
-        if i == 2:
-            y_hat.append(int(df.iloc[i - 2:i - 1, 0]))
+        if i <= 2:
+            y_hat.append(0)
         if 2 < i <= len(df[0:h_step]):
-            y_hat.append(df.iloc[i - 1, 0] + i * ((df.iloc[i - 1, 0] - df.iloc[0, 0]) / (i - 1)))
+            y_hat.append(df.iloc[i - 2, 0] + ((df.iloc[i - 2, 0] - df.iloc[0, 0]) / ((i-1) - 1)))
         if i > len(df[0:h_step]):
             y_hat.append(df.iloc[h_step - 1, 0] + (i - h_step) * (
                         (df.iloc[h_step - 1, 0] - df.iloc[0, 0]) / (len(df.iloc[0:h_step, 0]) - 1)))
@@ -196,6 +186,7 @@ plt.show()
 mse_pred_drift, mse_forecast_drift = mse_errors(newdata_drift)
 print('Drift method:')
 print(newdata_drift)
+
 print(f"MSE predicted Drift method: {mse_pred_drift}")
 print(f"MSE forecasted Drift method: {mse_forecast_drift}")
 
@@ -305,3 +296,5 @@ plt.show()
 
 auto_correlation(newdata_ses.iloc[2:9,2], 6, 'SES method autocorrelation of residuals (alpha 0.5)')
 plt.show()
+
+
