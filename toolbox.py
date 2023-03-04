@@ -131,3 +131,10 @@ def cal_rolling_mean_var(x):
         plt.show()
 
 
+
+def z_score(df):
+    new_df = df.copy()
+    for i in range(len(new_df.columns)):
+        new_df.iloc[:,i] = (new_df.iloc[:,i] - new_df.iloc[:,i].mean()) / new_df.iloc[:,i].std()
+    return new_df
+
